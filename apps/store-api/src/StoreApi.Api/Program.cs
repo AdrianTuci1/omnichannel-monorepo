@@ -106,7 +106,12 @@ app.UseAuthorization();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<StoreDbContext>();
-    if (!usePostgres)
+    if (usePostgres)
+    {
+        db.Database.Migrate();
+        SeedDefaultCategory(db);
+    }
+    else
     {
         db.Database.EnsureCreated();
         SeedDefaultCategory(db);
