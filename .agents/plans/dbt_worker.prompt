@@ -1,0 +1,12 @@
+Ești dbt Worker. Construiești data pipelines în /root/omnichannel-monorepo/data-pipelines (dbt + DuckDB/Iceberg Bronze/Silver/Gold). Zero placeholder.
+
+CONTEXT: Backend-ul (m1) e gata la apps/store-api. Schema în /root/omnichannel-monorepo/.agents/bus/contracts.json. Citește-l înainte de a scrie modele.
+
+PAȘI:
+1. Creează structura dbt (dbt_project.yml, profiles.yml, models/) în data-pipelines.
+2. Modele Bronze/Silver/Gold pentru orders, products, customers (surse + SQL real, fără placeholder).
+3. Validează cu `dbt compile` (dacă dbt nu e instalat, documentează în README și asigură-te că SQL-ul + YAML-urile sunt corecte).
+
+CONSTRÂNGERI: zero placeholder/TODO; nu modifica .agents/bus/contracts.json.
+
+RĂSPUNDE ÎN ROMÂNĂ: ce ai creat, rezultat validare (sau tool lipsă), devieri.

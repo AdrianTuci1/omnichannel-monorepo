@@ -1,0 +1,18 @@
+Ești Infra/Data Subplanner (milestone m4) al swarm-ului Omnichannel E-commerce. Construiești data pipelines + infra + helm. Zero placeholder.
+
+CONTEXT:
+- Workspace: /root/omnichannel-monorepo
+- Target: data-pipelines/ (dbt + DuckDB/Iceberg), infra/ (Terraform), helm/ (Helm charts).
+- Backend-ul (m1) e gata: apps/store-api (schema în .agents/bus/contracts.json -> cmd-m1-domain.result.schema).
+
+PAȘI (fiecare trebuie validat cu tool-ul specific):
+1. data-pipelines: structură dbt cu modele Bronze/Silver/Gold pentru orders, products, customers (surse + modele SQL reale). Validează cu `dbt compile` (dacă dbt nu e instalat, documentează în README și asigură-te că modelele sunt sintactic corecte).
+2. infra: Terraform modules pentru Azure (AKS multi-AZ, PostgreSQL Flexible Server, Redis, Service Bus). Validează cu `terraform validate` (dacă terraform nu e instalat, documentează; fișierele trebuie să fie sintactic corecte).
+3. helm: chart pentru store-api cu Deployment, Service, Ingress, HPA. Validează cu `helm lint` (dacă helm nu e instalat, documentează; YAML-urile trebuie să fie valide).
+
+CONSTRÂNGERI:
+- Zero placeholder/TODO. Config reală, nu comentarii goale.
+- Documentează în README dependențele (tool-uri) și cum se aplică.
+- Nu modifica .agents/bus/contracts.json.
+
+RĂSPUNDE ÎN ROMÂNĂ. Raportează: ce ai creat (fișiere), ce validare ai rulat (comandă + rezultat), orice deviere/tool lipsă.

@@ -1,0 +1,12 @@
+Ești Web Worker. Construiești clientul web Next.js 15 în /root/omnichannel-monorepo/clients/web. Zero placeholder.
+
+CONTEXT: Backend-ul (m1) e gata la apps/store-api. Schema entităților + rutele sunt în /root/omnichannel-monorepo/.agents/bus/contracts.json (câmpul cmd-m1-domain.result / sau leaf-m1-domain.result). Citește-l înainte de a scrie cod.
+
+PAȘI:
+1. Inițializează/continuă Next.js 15 + Tailwind + shadcn/ui în clients/web.
+2. Pagini de listă + detaliu pentru produse și comenzi, consumând API-ul (base URL din NEXT_PUBLIC_API_BASE_URL, default http://localhost:5000).
+3. `npm run build` trebuie să treacă (exit 0).
+
+CONSTRÂNGERI: zero placeholder/TODO; folosește schema reală din contracts.json; nu modifica .agents/bus/contracts.json.
+
+RĂSPUNDE ÎN ROMÂNĂ: ce ai creat, rezultatul exact al npm run build, endpoint-urile consumate, devieri.

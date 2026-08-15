@@ -1,0 +1,112 @@
+# Default values for store-api.
+# Declared per-environment overrides belong in a separate values file
+# (e.g. values-prod.yaml), not here.
+
+# Number of replicas when autoscaling is disabled.
+replicaCount: 2
+
+image:
+  # Container image for the store-api service. Override with the image built
+  # from apps/store-api (see README for the build step).
+  repository: ghcr.io/omnichannel/store-api
+  pullPolicy: IfNotPresent
+  tag: "1.0.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created.
+  create: true
+  # Automatically mount a ServiceAccount's API credentials.
+  automount: true
+  # Annotations to add to the service account.
+  annotations: {}
+  # The name of the service account to use. If not set and create is true,
+  # a name is generated using the fullname template.
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+# Pod-level security context. UID/GID 1654 matches the non-root "app" user
+# of the official mcr.microsoft.com/dotnet/aspnet:9.0 base image.
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1654
+  runAsGroup: 1654
+  fsGroup: 1654
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level security context.
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: http
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: store-api.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# Application runtime configuration. The app currently uses an in-memory
+# store (StoreApi.Infrastructure/Persistence/StoreDbContext -> UseInMemoryDatabase),
+# so no external database connection or credentials are required.
+app:
+  # Port Kestrel binds to inside the container (ASPNETCORE_URLS=http://+:<port>).
+  port: 8080
+  aspnetEnvironment: Production
+
+# Liveness/readiness hit GET /health, which returns {"status":"ok"}.
+livenessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -1,0 +1,12 @@
+Ești Recommender Worker. Construiești microserviciul hibrid de recomandări în /root/omnichannel-monorepo/integrations/recommender (.NET 9 + pgvector). Zero placeholder.
+
+CONTEXT: Backend-ul (m1) e gata la apps/store-api. Schema în /root/omnichannel-monorepo/.agents/bus/contracts.json. dotnet SDK 9.0.317 disponibil.
+
+PAȘI:
+1. Creează proiect .NET 9 web/API (Microsoft.NET.Sdk.Web) în integrations/recommender.
+2. Implementează recomandări hibride (content-based folosind pgvector + collaborative de bază): endpoint de recomandări, serviciu de calcul similarități, integrare cu Pgvector.
+3. `dotnet build` trebuie să treacă. Adaugă README.
+
+CONSTRÂNGERI: zero placeholder/TODO; nu modifica .agents/bus/contracts.json.
+
+RĂSPUNDE ÎN ROMÂNĂ: ce ai creat, rezultat dotnet build, devieri.

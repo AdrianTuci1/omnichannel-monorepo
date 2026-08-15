@@ -1,0 +1,144 @@
+version: 2
+
+sources:
+  - name: raw
+    description: >
+      Landing zone Parquet (Bronze raw). Fișierele provin din baza de date PostgreSQL
+      a store-api (apps/store-api), exportate în data/raw/ prin
+      scripts/ingest_from_postgres.sql (DuckDB postgres attach -> COPY TO parquet).
+      Coloanele păstrează numele fizice EF Core: scalari PascalCase, tipul Money ca
+      pereche snake_case (price_amount/price_currency, unit_price_amount/unit_price_currency).
+      GUID-urile sunt citite ca UUID, Status este integer (enum OrderStatus: 1..6).
+    tables:
+      - name: orders
+        description: Tabelul fizic "orders" din store-api.
+        meta:
+          external_location: "read_parquet('data/raw/orders.parquet')"
+        columns:
+          - name: Id
+            description: PK, GUID.
+            tests: ["not_null"]
+          - name: OrderNumber
+            description: Număr unic de comandă (ORD-yyyyMMdd-XXXXXXXX).
+            tests: ["not_null"]
+          - name: CustomerId
+            description: FK spre customers.Id.
+            tests: ["not_null"]
+          - name: Status
+            description: OrderStatus ca integer (1=Draft..6=Cancelled).
+          - name: Currency
+            description: Cod ISO 4217 (3 litere).
+          - name: Notes
+            description: Note opționale.
+          - name: CreatedAt
+            description: Momentul creării (UTC).
+          - name: UpdatedAt
+            description: Momentul ultimei modificări (UTC, nullable).
+
+      - name: order_lines
+        description: Tabelul fizic "order_lines" din store-api.
+        meta:
+          external_location: "read_parquet('data/raw/order_lines.parquet')"
+        columns:
+          - name: Id
+            description: PK, GUID.
+            tests: ["not_null"]
+          - name: OrderId
+            description: FK spre orders.Id.
+            tests: ["not_null"]
+          - name: ProductId
+            description: FK spre products.Id.
+            tests: ["not_null"]
+          - name: ProductName
+            description: Snapshot al numelui produsului la momentul comenzii.
+          - name: Quantity
+            description: Cantitate (strict pozitivă).
+          - name: unit_price_amount
+            description: Preț unitar (Money.Amount).
+          - name: unit_price_currency
+            description: Moneda prețului unitar (Money.Currency).
+
+      - name: products
+        description: Tabelul fizic "products" din store-api.
+        meta:
+          external_location: "read_parquet('data/raw/products.parquet')"
+        columns:
+          - name: Id
+            description: PK, GUID.
+            tests: ["not_null"]
+          - name: Sku
+            description: SKU unic, uppercase.
+            tests: ["not_null"]
+          - name: Name
+            description: Nume produs.
+            tests: ["not_null"]
+          - name: Description
+            description: Descriere opțională.
+          - name: IsActive
+            description: Flag produs activ.
+          - name: CategoryId
+            description: FK spre categories.Id.
+          - name: price_amount
+            description: Preț (Money.Amount), decimal(18,2).
+          - name: price_currency
+            description: Moneda prețului (Money.Currency).
+          - name: CreatedAt
+            description: Momentul creării (UTC).
+          - name: UpdatedAt
+            description: Momentul ultimei modificări (UTC).
+
+      - name: categories
+        description: Tabelul fizic "categories" din store-api.
+        meta:
+          external_location: "read_parquet('data/raw/categories.parquet')"
+        columns:
+          - name: Id
+            description: PK, GUID.
+            tests: ["not_null"]
+          - name: Name
+            description: Nume categorie.
+          - name: Slug
+            description: Slug unic.
+          - name: Description
+            description: Descriere opțională.
+          - name: ParentId
+            description: FK autoreferențial spre categories.Id (nullable).
+
+      - name: customers
+        description: Tabelul fizic "customers" din store-api.
+        meta:
+          external_location: "read_parquet('data/raw/customers.parquet')"
+        columns:
+          - name: Id
+            description: PK, GUID.
+            tests: ["not_null"]
+          - name: Email
+            description: Email unic, lowercase.
+            tests: ["not_null"]
+          - name: FirstName
+            description: Prenume.
+            tests: ["not_null"]
+          - name: LastName
+            description: Nume.
+            tests: ["not_null"]
+          - name: Phone
+            description: Telefon opțional.
+          - name: CreatedAt
+            description: Momentul creării (UTC).
+
+      - name: inventory
+        description: Tabelul fizic "inventory" din store-api (o linie per produs).
+        meta:
+          external_location: "read_parquet('data/raw/inventory.parquet')"
+        columns:
+          - name: ProductId
+            description: PK/FK spre products.Id.
+            tests: ["not_null"]
+          - name: QuantityOnHand
+            description: Stoc fizic disponibil.
+          - name: Reserved
+            description: Cantitate rezervată.
+          - name: ReorderThreshold
+            description: Prag de reaprovizionare.
+          - name: UpdatedAt
+            description: Momentul ultimei actualizări (UTC).

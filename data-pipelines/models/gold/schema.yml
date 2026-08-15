@@ -1,0 +1,74 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: "Dimensiune clienți (grain: un rând per client)."
+    columns:
+      - name: customer_id
+        tests: ["not_null", "unique"]
+      - name: email
+        tests: ["not_null", "unique"]
+      - name: full_name
+        tests: ["not_null"]
+
+  - name: dim_products
+    description: "Dimensiune produse cu numele categoriei (grain: un rând per produs)."
+    columns:
+      - name: product_id
+        tests: ["not_null", "unique"]
+      - name: sku
+        tests: ["not_null", "unique"]
+      - name: name
+        tests: ["not_null"]
+
+  - name: dim_categories
+    description: "Dimensiune categorii cu numele părintelui (grain: un rând per categorie)."
+    columns:
+      - name: category_id
+        tests: ["not_null", "unique"]
+      - name: slug
+        tests: ["not_null", "unique"]
+
+  - name: fact_orders
+    description: >
+      Fapte comenzi (grain: un rând per comandă), cu totalul și numărul de linii
+      agregate din silver_order_lines și atributele clientului.
+    columns:
+      - name: order_id
+        tests: ["not_null", "unique"]
+      - name: order_number
+        tests: ["not_null", "unique"]
+      - name: customer_id
+        tests: ["not_null"]
+      - name: total_amount
+        tests: ["not_null"]
+
+  - name: fact_order_lines
+    description: >
+      Fapte linii de comandă (grain: un rând per linie), cu atribute curente ale
+      produsului plus snapshot-ul numelui la momentul comenzii.
+    columns:
+      - name: order_line_id
+        tests: ["not_null", "unique"]
+      - name: order_id
+        tests: ["not_null"]
+      - name: product_id
+        tests: ["not_null"]
+
+  - name: mart_customer_lifetime_value
+    description: "Lifetime value per client (grain: un rând per client)."
+    columns:
+      - name: customer_id
+        tests: ["not_null", "unique"]
+
+  - name: mart_daily_sales
+    description: "Vânzări agregate pe zi/monedă/status (grain: order_date + currency + status)."
+    columns:
+      - name: order_date
+        tests: ["not_null"]
+
+  - name: mart_product_performance
+    description: "Performanță produs (grain: un rând per produs)."
+    columns:
+      - name: product_id
+        tests: ["not_null", "unique"]

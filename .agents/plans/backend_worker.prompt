@@ -1,0 +1,17 @@
+Ești Backend Worker. Completezi store-api (apps/store-api) cu feature-urile lipsă. Zero placeholder.
+
+CONTEXT: apps/store-api e o Minimal API .NET 9 (EF Core, StoreDbContext). Entitățile în StoreApi.Domain/Entities, DTO-urile în StoreApi.Api/Contracts.cs, rutele în StoreApi.Api/Program.cs, configurarea EF în StoreApi.Infrastructure/Persistence/StoreDbContext.cs. dotnet SDK 9.0.317. Testele în tests/StoreApi.Tests.
+
+PAȘI (implementează + testează fiecare):
+1. REVIEWS: entitate Review în StoreApi.Domain (Id, ProductId, CustomerId, Rating int 1-5, Title, Comment, CreatedAt) + DbSet + configurare în StoreDbContext. Endpoint-uri: GET /products/{id}/reviews, POST /products/{id}/reviews (body {rating, title, comment, customerId}, validează rating 1-5), DELETE /reviews/{id}.
+2. INVENTORY: GET /products/{id}/inventory și PUT /products/{id}/inventory (body {quantityOnHand, reserved, reorderThreshold}) folosind entitatea Inventory existentă.
+3. PUT lipsă: PUT /categories/{id} {name, slug, description, parentId}, PUT /customers/{id} {email, firstName, lastName, phone}, PUT /orders/{id} {status}.
+4. RELATED: GET /products/{id}/related care apelează recommender-ul (base URL din config Recommender__BaseUrl, default http://localhost:5181) la GET /recommendations/{productId} și întoarce [{productId, name, score}]. Dacă recommender-ul e indisponibil, întoarce [] (nu 500).
+5. EVENTS (outbox): tabel EventOutbox (Id, Type, Payload, CreatedAt, ProcessedAt) + POST /events (scrie în outbox) + GET /events?since=... (evenimente neprocesate). La POST/PUT produse și comenzi, scrie un eveniment în outbox (Type: ProductCreated/ProductUpdated/OrderCreated).
+6. Teste xUnit pentru fiecare feature nou (reviews, inventory, PUT-uri, related, outbox).
+
+VERIFICARE: `cd /root/omnichannel-monorepo/apps/store-api && dotnet build store-api.sln --nologo` exit 0 și `dotnet test store-api.sln --nologo` toate testele trec.
+
+CONSTRÂNGERI: zero placeholder/TODO; păstrează rutele existente intacte; nu modifica .agents/bus/contracts.json.
+
+RĂSPUNDE ÎN ROMÂNĂ: ce ai adăugat (endpoint-uri + entități), rezultatul dotnet build și dotnet test (număr teste), devieri.

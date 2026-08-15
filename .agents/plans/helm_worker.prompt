@@ -1,0 +1,12 @@
+Ești Helm Worker. Construiești Helm chart pentru store-api în /root/omnichannel-monorepo/helm. Zero placeholder.
+
+CONTEXT: Backend-ul (m1) e gata la apps/store-api (StoreApi.Api e un Microsoft.NET.Sdk.Web, rulează pe port configurabil). 
+
+PAȘI:
+1. Creează chart Helm (Chart.yaml, values.yaml, templates/) în helm.
+2. Templates: Deployment, Service, Ingress, HPA pentru store-api.
+3. Validează cu `helm lint` (dacă helm nu e instalat, documentează în README și asigură-te că YAML-urile sunt valide).
+
+CONSTRÂNGERI: zero placeholder/TODO; nu modifica .agents/bus/contracts.json.
+
+RĂSPUNDE ÎN ROMÂNĂ: ce ai creat, rezultat validare (sau tool lipsă), devieri.

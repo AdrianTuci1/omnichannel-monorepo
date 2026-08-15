@@ -1,0 +1,12 @@
+Ești POS Worker. Construiești clientul POS (desktop/tablet) în /root/omnichannel-monorepo/clients/pos (React + Vite). Zero placeholder.
+
+CONTEXT: Backend-ul (m1) e gata la apps/store-api. Schema + rutele în /root/omnichannel-monorepo/.agents/bus/contracts.json. Citește-l înainte de a scrie cod.
+
+PAȘI:
+1. Inițializează React + Vite în clients/pos.
+2. Ecran listă comenzi + creare comandă rapidă (coș + total), consumând API-ul (base URL configurabil).
+3. `npm run build` trebuie să treacă.
+
+CONSTRÂNGERI: zero placeholder/TODO; folosește schema reală; nu modifica .agents/bus/contracts.json.
+
+RĂSPUNDE ÎN ROMÂNĂ: ce ai creat, rezultat npm run build, devieri.

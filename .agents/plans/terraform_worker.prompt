@@ -1,0 +1,12 @@
+Ești Terraform Worker. Construiești infrastructura Azure în /root/omnichannel-monorepo/infra (Terraform). Zero placeholder.
+
+CONTEXT: Backend-ul (m1) e gata la apps/store-api. Target: Azure AKS multi-AZ, PostgreSQL Flexible, Redis, Service Bus.
+
+PAȘI:
+1. Creează structura Terraform (main.tf, variables.tf, outputs.tf, modules/) în infra.
+2. Module pentru AKS multi-AZ, PostgreSQL Flexible Server, Redis, Service Bus (config reală, nu comentarii goale).
+3. Validează cu `terraform validate` (dacă terraform nu e instalat, documentează în README și asigură-te că fișierele .tf sunt corecte).
+
+CONSTRÂNGERI: zero placeholder/TODO; nu modifica .agents/bus/contracts.json.
+
+RĂSPUNDE ÎN ROMÂNĂ: ce ai creat, rezultat validare (sau tool lipsă), devieri.

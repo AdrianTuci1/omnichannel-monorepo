@@ -1,0 +1,36 @@
+Ești Domain Worker (milestone m1) al swarm-ului Omnichannel E-commerce. Finalizează milestone-ul m1 (Domain core) al monorepo-ului, totul funcțional, ZERO placeholder.
+
+CONTEXT:
+- Workspace: /root/omnichannel-monorepo
+- dotnet SDK 9.0.317 instalat (/usr/local/bin/dotnet).
+- Structura existentă (parțial construită de un worker anterior care s-a blocat):
+  * /root/omnichannel-monorepo/apps/store-api/Directory.Build.props — net9.0, LangVersion 13, Nullable enable, ImplicitUsings enable.
+  * /root/omnichannel-monorepo/apps/store-api/src/StoreApi.Domain/ — entități: Entities/Product.cs, Category.cs, Order.cs, OrderLine.cs, Customer.cs, Inventory.cs, OrderStatus.cs, Common/Money.cs (tip Money cu Amount+Currency), Search/ProductSearchResult.cs. ACEST PROIECT COMPILEAZĂ.
+  * /root/omnichannel-monorepo/apps/store-api/src/StoreApi.Infrastructure/ — Persistence/StoreDbContext.cs (DbContext complet + pgvector + branch InMemory), Persistence/ProductEmbedding.cs, Search/IProductSearchService.cs, Search/VectorProductSearchService.cs, Embeddings/HashingEmbeddingService.cs, Embeddings/VectorMath.cs. NU COMPILEAZĂ: lipsește `using Pgvector;` în StoreDbContext.cs (folosește tipul `Vector` la linia ~188).
+  * StoreApi.Infrastructure.csproj referă deja pachetele corecte (EF Core 9.0.4, Npgsql 9.0.4, Pgvector 0.3.2, Pgvector.EFCore 0.3.0, RedLock.net 2.3.2, Azure.Messaging.ServiceBus 7.18.4).
+- NU există încă: proiectul StoreApi.Api, fișierul .sln, proiectul de teste xUnit. Le creezi tu.
+
+Entitățile (citește fișierele pentru detalii exacte): Product (Id, Sku, Name, Description, IsActive, Price:Money, CategoryId, Category), Category (Id, Name, Slug, Description, ParentId, Parent, Children, Products), Customer (Id, Email, FirstName, LastName, Phone, Orders), Order (Id, OrderNumber, Currency, Status:OrderStatus, Notes, Total calculat, CustomerId, Customer, Lines), OrderLine (Id, ProductName, Quantity, UnitPrice:Money, OrderId, ProductId, Order), Inventory (ProductId key, QuantityOnHand, Reserved, ReorderThreshold, Product), ProductEmbedding (ProductId key, ModelVersion, Embedding:Vector), OrderStatus enum.
+
+PAȘI (în ordine, verifică fiecare):
+1. REPARĂ BUILD-UL: adaugă `using Pgvector;` în StoreDbContext.cs (blocul de using-uri de sus). Rulează `cd /root/omnichannel-monorepo/apps/store-api/src/StoreApi.Infrastructure && dotnet build StoreApi.Infrastructure.csproj --nologo` și confirmă exit 0. Rezolvă orice altă eroare minoră de compilare (using-uri, namespace-uri).
+2. CREEZĂ StoreApi.Api: /root/omnichannel-monorepo/apps/store-api/src/StoreApi.Api/StoreApi.Api.csproj (Sdk Microsoft.NET.Sdk.Web, net9.0, RootNamespace StoreApi.Api, ProjectReference către Infrastructure și Domain). Program.cs cu Minimal API:
+   - Înregistrează StoreDbContext cu InMemory provider pentru rulare locală fără PostgreSQL.
+   - Endpoint-uri CRUD funcționale (GET list / GET by id / POST create / DELETE) pentru Products și Orders, cu DTO-uri simple mapate pe entitățile reale din StoreApi.Domain.
+   - GET /health -> 200 OK.
+3. CREEZĂ soluția: /root/omnichannel-monorepo/apps/store-api/store-api.sln (dotnet new sln + dotnet sln add pentru Domain, Infrastructure, Api, și proiectul de teste de la pasul 4).
+4. CREEZĂ teste xUnit: /root/omnichannel-monorepo/apps/store-api/tests/StoreApi.Tests/StoreApi.Tests.csproj (xUnit, net9.0, referințe Domain+Infrastructure+Api). Scrie teste reale care trec: (a) Order își calculează Total corect din linii; (b) integrare API: POST + GET /products cu InMemory.
+5. VERIFICARE FINALĂ: `cd /root/omnichannel-monorepo/apps/store-api && dotnet build store-api.sln --nologo` exit 0, apoi `dotnet test store-api.sln --nologo` toate testele trec.
+
+CONSTRÂNGERI STRICTE:
+- ZERO placeholder / TODO / NotImplementedException. Fiecare endpoint și test funcțional.
+- Fără logging excesiv.
+- NU modifica .agents/bus/contracts.json (orchestratorul se ocupă).
+- NU atinge StoreApi.Domain (doar citește-l ca referință).
+
+RĂSPUNDE ÎN ROMÂNĂ. La final raportează:
+- Lista completă de rute API (metodă + path + descriere).
+- Lista entităților și câmpurile principale (schema).
+- Rezultatul exact al `dotnet build store-api.sln` și `dotnet test store-api.sln` (număr teste trecute).
+- Calea absolută a .sln și a proiectului Api.
+- Orice deviere sau eroare rămasă nerezolvată.

@@ -1,0 +1,19 @@
+StoreApi deployed as release {{ .Release.Name }} in namespace {{ .Release.Namespace }}.
+
+The service exposes these routes:
+  GET /health      liveness/readiness probe (returns {"status":"ok"})
+  GET/POST/DELETE  /categories, /customers, /products, /orders
+  PUT              /products/{id}
+
+{{- if .Values.ingress.enabled }}
+Access the API at:
+{{- range .Values.ingress.hosts }}
+  http://{{ .host }}
+{{- end }}
+{{- else }}
+The Ingress is disabled. To expose the API outside the cluster, re-install with:
+  --set ingress.enabled=true --set ingress.host=store-api.example.com
+{{- end }}
+
+To view resources for this release:
+  kubectl get all -l app.kubernetes.io/instance={{ .Release.Name }}

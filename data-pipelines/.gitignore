@@ -1,0 +1,8 @@
+target/
+.venv/
+dbt_packages/
+logs/
+.user.yml
+*.duckdb
+data/raw/*.parquet
+data/raw/*.parquet.gz

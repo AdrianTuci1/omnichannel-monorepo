@@ -1,0 +1,20 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+crash.log
+crash.*.log
+
+# Variabile locale (secrete) — nu se commit-uiesc
+*.tfvars
+!terraform.tfvars.example
+
+# Override-uri locale
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Fișiere de plan locale
+*.plan

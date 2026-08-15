@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Omnichannel Store</string>
+    <string name="products_title">Produse</string>
+    <string name="product_detail_title">Detaliu produs</string>
+    <string name="refresh">Reîmprospătează</string>
+    <string name="back">Înapoi</string>
+    <string name="offline_short">Offline</string>
+    <string name="offline_banner">Offline — se afișează date din cache</string>
+    <string name="retry">Reîncearcă</string>
+    <string name="loading">Se încarcă…</string>
+    <string name="empty_products">Nu există produse.</string>
+    <string name="error_offline_message">Nu s-a putut contacta serverul. Verifică conexiunea și URL-ul API-ului.</string>
+    <string name="error_product_not_found">Produsul nu a fost găsit.</string>
+    <string name="status_active">Activ</string>
+    <string name="status_inactive">Inactiv</string>
+    <string name="label_sku">SKU</string>
+    <string name="label_category">Categorie</string>
+    <string name="label_description">Descriere</string>
+    <string name="label_created_at">Creat la</string>
+    <string name="label_status">Status</string>
+    <string name="label_id">ID</string>
+    <string name="no_description">Fără descriere</string>
+    <string name="uncategorized">Fără categorie</string>
+</resources>

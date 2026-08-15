@@ -1,0 +1,8 @@
+omnichannel:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "target/omnichannel.duckdb"
+      schema: main
+      threads: 4

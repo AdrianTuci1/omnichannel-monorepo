@@ -1,0 +1,15 @@
+Ești Recommender Worker. Conectezi recommender-ul (integrations/recommender) la store-api. Zero placeholder.
+
+CONTEXT: integrations/recommender e o Minimal API .NET 9 (RecommenderDbContext) cu endpoint-uri GET /recommendations/{productId}, /recommendations/customer/{customerId}, /recommendations/search. Momentan e izolat (date seed fictive). dotnet SDK 9.0.317.
+
+PAȘI:
+1. Adaugă client HTTP StoreApiClient care citește produse + comenzi din store-api (base URL config StoreApi__BaseUrl, default http://localhost:5180): GET /products, GET /orders.
+2. La pornire (sau lazy, la prima cerere), încarcă produsele + comenzile reale din store-api în RecommenderDbContext (înlocuiește seed-ul fictiv).
+3. Păstrează endpoint-urile /recommendations/*; răspunsul pentru /recommendations/{productId} să aibă forma [{productId, name, score}] (ca store-api să-l consume direct la GET /products/{id}/related).
+4. Adaugă GET /products/{id}/related ca alias local (proxy intern către /recommendations/{productId}) pentru testare directă.
+
+VERIFICARE: `cd /root/omnichannel-monorepo/integrations/recommender && dotnet build --nologo` exit 0.
+
+CONSTRÂNGERI: zero placeholder/TODO; nu modifica .agents/bus/contracts.json.
+
+RĂSPUNDE ÎN ROMÂNĂ: ce ai conectat, rezultatul dotnet build, devieri.

@@ -1,0 +1,15 @@
+Ești Integrations Worker. Faci integrările bidirecționale (Odoo, Akeneo, CDP). Zero placeholder.
+
+CONTEXT: integrations/odoo și integrations/akeneo au deja StoreApiClient (scriu în store-api). Trebuie și direcția inversă + CDP. store-api va expune GET /events?since=... (outbox evenimente). dotnet SDK 9.0.317.
+
+PAȘI:
+1. Odoo (integrations/odoo): adaugă sincronizarea inversă — citește comenzile din store-api (GET /orders) și actualizează statusul în Odoo (sale.order) pentru cele modificate. Documentează fluxul bidirecțional în README.
+2. Akeneo (integrations/akeneo): adaugă sincronizarea inversă — citește produsele din store-api (GET /products) și le exportă în Akeneo (produse/atribute). Documentează în README.
+3. CDP (integrations/cdp): consumă evenimentele din store-api (GET /events?since=...) printr-un poller periodic (BackgroundService), procesează și scrie în DuckDB/Iceberg (documentează schema de ieșire în README).
+4. Fiecare proiect să compileze: dotnet build.
+
+VERIFICARE: `cd /root/omnichannel-monorepo/integrations && for d in odoo akeneo cdp; do dotnet build $d --nologo || exit 1; done` exit 0.
+
+CONSTRÂNGERI: zero placeholder/TODO; nu modifica .agents/bus/contracts.json.
+
+RĂSPUNDE ÎN ROMÂNĂ: ce ai făcut bidirecțional în fiecare, rezultatul dotnet build, devieri.

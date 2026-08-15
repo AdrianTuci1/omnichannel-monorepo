@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>StoreApi.Domain</RootNamespace>
+    <AssemblyName>StoreApi.Domain</AssemblyName>
+  </PropertyGroup>
+</Project>

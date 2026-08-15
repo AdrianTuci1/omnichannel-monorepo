@@ -1,0 +1,19 @@
+Ești Clients Subplanner (milestone m2) al swarm-ului Omnichannel E-commerce. Construiește clienții: web, Android și POS. Zero placeholder.
+
+CONTEXT:
+- Workspace: /root/omnichannel-monorepo
+- Backend-ul (m1) e gata: apps/store-api (18 rute CRUD products/orders + GET /health). Schema entităților și rutele sunt în .agents/bus/contracts.json (câmpul cmd-m1-domain.result). Citește-l ÎNAINTE de a scrie cod.
+- Stack: clients/web = Next.js 15 + Tailwind + shadcn/ui; clients/android = Kotlin + Jetpack Compose + Room; clients/pos = desktop/tablet (web-based, e.g. Vite + React sau Electron).
+
+PAȘI:
+1. clients/web: inițializează Next.js 15 (create-next-app sau manual), pagini de listă + detaliu produse și comenzi care consumă API-ul (folosește fetch cu base URL configurabil, default http://localhost:5000). Compilează: npm run build trebuie să treacă.
+2. clients/android: proiect Kotlin cu Jetpack Compose + Room pentru cache offline. Ecrane listă/detaliu produse. Compilează: ./gradlew assembleDebug (dacă Android SDK lipsă, documentează în README și asigură-te că sursele sunt corecte/complete).
+3. clients/pos: client desktop/tablet minimal (React+Vite) cu listă comenzi + creare comandă rapidă. Compilează: npm run build.
+
+CONSTRÂNGERI:
+- Zero placeholder/TODO. Fiecare ecran/pagină funcțional.
+- Consumă schema reală din contracts.json (numele câmpurilor din m1.result.schema).
+- Nu scrie cod care depinde de endpoint-uri inexistente.
+- Nu modifica .agents/bus/contracts.json.
+
+RĂSPUNDE ÎN ROMÂNĂ. Raportează: ce proiecte ai creat, cum compilează fiecare (comanda + rezultat), ce endpoint-uri consumă, orice deviere.

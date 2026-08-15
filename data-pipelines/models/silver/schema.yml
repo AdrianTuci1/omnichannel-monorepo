@@ -1,0 +1,85 @@
+version: 2
+
+models:
+  - name: silver_orders
+    description: >
+      Comenzi curățate: dedup pe order_id, status mapat din integer în etichetă,
+      monedă normalizată la uppercase.
+    columns:
+      - name: order_id
+        tests: ["not_null", "unique"]
+      - name: order_number
+        tests: ["not_null", "unique"]
+      - name: customer_id
+        tests: ["not_null"]
+      - name: status_code
+        description: OrderStatus ca integer (1..6).
+        tests: ["not_null"]
+      - name: status
+        description: Eticheta statusului.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["Draft", "Pending", "Paid", "Shipped", "Delivered", "Cancelled"]
+      - name: currency
+        tests: ["not_null"]
+
+  - name: silver_order_lines
+    description: >
+      Linii de comandă curățate, cu line_total_amount = unit_price_amount * quantity.
+    columns:
+      - name: order_line_id
+        tests: ["not_null", "unique"]
+      - name: order_id
+        tests: ["not_null"]
+      - name: product_id
+        tests: ["not_null"]
+      - name: quantity
+        tests: ["not_null"]
+      - name: line_total_amount
+        tests: ["not_null"]
+
+  - name: silver_products
+    description: Produse curățate, dedup pe product_id, sku/monedă uppercase.
+    columns:
+      - name: product_id
+        tests: ["not_null", "unique"]
+      - name: sku
+        tests: ["not_null", "unique"]
+      - name: name
+        tests: ["not_null"]
+      - name: price_amount
+        tests: ["not_null"]
+      - name: price_currency
+        tests: ["not_null"]
+
+  - name: silver_categories
+    description: Categorii curățate, dedup pe category_id, slug lowercase.
+    columns:
+      - name: category_id
+        tests: ["not_null", "unique"]
+      - name: slug
+        tests: ["not_null", "unique"]
+
+  - name: silver_customers
+    description: >
+      Clienți curățați: dedup pe customer_id, email lowercase, email_domain extras,
+      full_name compus.
+    columns:
+      - name: customer_id
+        tests: ["not_null", "unique"]
+      - name: email
+        tests: ["not_null", "unique"]
+      - name: full_name
+        tests: ["not_null"]
+
+  - name: silver_inventory
+    description: >
+      Stoc curățat: dedup pe product_id, available = quantity_on_hand - reserved,
+      stock_status derivat.
+    columns:
+      - name: product_id
+        tests: ["not_null", "unique"]
+      - name: available
+        tests: ["not_null"]

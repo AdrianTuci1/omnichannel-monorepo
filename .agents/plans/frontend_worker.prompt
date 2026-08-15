@@ -1,0 +1,17 @@
+Ești Frontend Worker. Completezi clientul web (clients/web) cu feature-urile lipsă. Zero placeholder.
+
+CONTEXT: Next.js 15 + Tailwind + shadcn/ui. Pagini în clients/web/src/app (/, /products, /products/[id], /orders, /orders/[id]). lib/api.ts are doar apiGet+apiDelete. Tipuri în lib/types.ts.
+
+PAȘI:
+1. Adaugă apiPost + apiPut în src/lib/api.ts (cu Content-Type application/json).
+2. Formular adăugare produs: pagină /products/new cu form (sku, name, description, price.amount, price.currency, categoryId) care face POST /products și redirect la /products.
+3. Recenzii: pe pagina /products/[id] afișează recenziile (GET /products/{id}/reviews) + formular de recenzie (rating 1-5, title, comment, customerId) care face POST /products/{id}/reviews.
+4. Produse similare: pe pagina /products/[id] afișează secțiunea „Produse similare" (GET /products/{id}/related).
+5. Storefront: pagina principală (/) să afișeze produse featured (GET /products, primele 8) cu link-uri către detalii, păstrând și health-check-ul.
+6. Actualizează src/lib/types.ts cu tipurile noi (Review, RelatedProduct, CreateProductRequest, CreateReviewRequest).
+
+VERIFICARE: `cd /root/omnichannel-monorepo/clients/web && npm run build` trebuie să treacă (exit 0).
+
+CONSTRÂNGERI: zero placeholder/TODO; folosește contractele backend (Review {rating, title, comment, customerId}; Related [{productId, name, score}]); nu modifica .agents/bus/contracts.json.
+
+RĂSPUNDE ÎN ROMÂNĂ: ce ai adăugat, rezultatul npm run build, devieri.
