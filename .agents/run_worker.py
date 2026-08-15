@@ -93,7 +93,7 @@ def main():
             line = line.rstrip("\n")
             if line.strip():
                 log(name, line)
-        proc.wait(timeout=600)
+        proc.wait(timeout=1800)
         code = proc.returncode
         log(name, f"Exit code: {code}")
         update_worker_status(name, status="done" if code == 0 else "failed",
@@ -101,7 +101,7 @@ def main():
                              finished_at=datetime.now(timezone.utc).isoformat())
     except subprocess.TimeoutExpired:
         proc.kill()
-        log(name, "Timeout după 600s")
+        log(name, "Timeout după 1800s")
         update_worker_status(name, status="timeout",
                              finished_at=datetime.now(timezone.utc).isoformat())
     except Exception as e:

@@ -1,0 +1,25 @@
+Ești Backend Worker (finalizare). Implementezi autentificare distribuită, search, coș și migrări EF Core în store-api (apps/store-api). Zero placeholder.
+
+CONTEXT: apps/store-api e o Minimal API .NET 9 (EF Core, StoreDbContext). Rutele în StoreApi.Api/Program.cs, DTO-urile în Contracts.cs, entitățile în StoreApi.Domain/Entities. dotnet SDK 9.0.317. Teste în tests/StoreApi.Tests. Provider local = InMemory, prod = PostgreSQL (Npgsql + pgvector). Redis e disponibil în stack (folosit și de Redlock).
+
+PAȘI:
+1. AUTH (JWT + refresh tokens în Redis — distribuit):
+   - Adaugă entitate User (Id, Email unic, PasswordHash, FirstName, LastName, CreatedAt) + DbSet.
+   - Pachete: Microsoft.AspNetCore.Authentication.JwtBearer, BCrypt.Net-Next (hash parole), Microsoft.Extensions.Caching.StackExchangeRedis (sau StackExchange.Redis).
+   - Endpoint-uri:
+     * POST /auth/register {email, password, firstName, lastName} -> 201 {userId} (validează email unic, hash BCrypt)
+     * POST /auth/login {email, password} -> 200 {accessToken, refreshToken, expiresIn} (401 dacă greșit)
+     * POST /auth/refresh {refreshToken} -> 200 {accessToken, refreshToken, expiresIn} (rotire refresh; invalid)
+     * POST /auth/logout {refreshToken} -> 204 (șterge refresh din Redis)
+   - Access token: JWT HS256, secret din config `Jwt:Secret` (fallback dev), TTL 15 min. Refresh token: string opac aleator, stocat în Redis `refresh:<token>` = userId, TTL 7 zile (IDistributedCache).
+   - Configurează `AddAuthentication(JwtBearer)` + `[Authorize]` pe endpoint-urile mutaționale (POST/PUT/DELETE products, orders, reviews, categories, customers, cart). GET-urile rămân publice.
+2. CART (Redis, per user autentificat): GET /cart (lista coșului cu produs+quantity), POST /cart/items {productId, quantity}, PUT /cart/items/{productId} {quantity}, DELETE /cart/items/{productId}. Cheie Redis `cart:<userId>`.
+3. SEARCH: GET /products/search?q=... — caută în Name/Sku/Description (EF Core .Contains / ILIKE), returnează lista de produse.
+4. MIGRĂRI EF Core: adaugă Microsoft.EntityFrameworkCore.Design, instalează dotnet-ef dacă lipsește, creează migrare `InitialCreate` pentru PostgreSQL + `CREATE EXTENSION vector` în migrare. Documentează comanda de aplicare.
+5. TESTE xUnit noi: auth register/login (cu InMemory + Redis absent -> fallback in-memory pentru teste), search, cart.
+
+VERIFICARE: `cd /root/omnichannel-monorepo/apps/store-api && dotnet build store-api.sln --nologo` exit 0 + `dotnet test store-api.sln --nologo` toate testele trec.
+
+CONSTRÂNGERI: zero placeholder; păstrează rutele existente; Redis configurabil (`Redis:ConnectionString`, default localhost:6379) cu fallback in-memory în teste; nu modifica .agents/bus/contracts.json.
+
+RĂSPUNDE ÎN ROMÂNĂ: ce ai adăugat (endpoint-uri, entități, pachete), rezultat dotnet build + test, comanda de migrare, devieri.

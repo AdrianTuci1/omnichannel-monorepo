@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  store-api:
+    name: Build & test store-api (.NET 9)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Restore
+        run: dotnet restore apps/store-api/store-api.sln
+      - name: Build
+        run: dotnet build apps/store-api/store-api.sln --no-restore --nologo
+      - name: Test
+        run: dotnet test apps/store-api/store-api.sln --no-build --nologo
+
+  frontend:
+    name: Build frontend (Next.js)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: clients/web/package-lock.json
+      - name: Install
+        working-directory: clients/web
+        run: npm ci
+      - name: Build
+        working-directory: clients/web
+        run: npm run build
+
+  integrations:
+    name: Build integrations (.NET 9)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Build integrations
+        run: |
+          for d in integrations/odoo integrations/akeneo integrations/cdp integrations/recommender; do
+            dotnet build "$d" --nologo || exit 1
+          done

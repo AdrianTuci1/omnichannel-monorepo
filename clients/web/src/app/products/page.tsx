@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 import { apiGet } from "@/lib/api";
 import { formatMoney, type ProductResponse } from "@/lib/types";
@@ -9,13 +10,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState, ErrorState, LoadingState } from "@/components/states";
 
-export default function ProductsPage() {
+function ProductsList() {
+  const searchParams = useSearchParams();
+  const q = searchParams.get("q") ?? "";
+  const trimmed = q.trim();
+
   const [products, setProducts] = useState<ProductResponse[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    apiGet<ProductResponse[]>("/products")
+    const path =
+      trimmed === ""
+        ? "/products"
+        : `/products/search?q=${encodeURIComponent(trimmed)}`;
+
+    setProducts(null);
+    setError(null);
+    apiGet<ProductResponse[]>(path)
       .then((data) => {
         if (!cancelled) setProducts(data);
       })
@@ -25,7 +37,7 @@ export default function ProductsPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [trimmed]);
 
   if (error) return <ErrorState message={error} />;
   if (!products) return <LoadingState label="Se încarcă produsele…" />;
@@ -34,7 +46,7 @@ export default function ProductsPage() {
     <div className="flex flex-col gap-6">
       <div className="flex items-baseline justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
-          Produse
+          {trimmed === "" ? "Produse" : `Rezultate pentru „${trimmed}”`}
         </h1>
         <span className="text-sm text-neutral-500">
           {products.length} produs{products.length === 1 ? "" : "e"}
@@ -42,7 +54,13 @@ export default function ProductsPage() {
       </div>
 
       {products.length === 0 ? (
-        <EmptyState label="Nu există produse. Creează-le prin API (POST /products)." />
+        <EmptyState
+          label={
+            trimmed === ""
+              ? "Nu există produse. Creează-le prin API (POST /products)."
+              : `Niciun produs nu corespunde căutării „${trimmed}”.`
+          }
+        />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((product) => (
@@ -75,5 +93,13 @@ export default function ProductsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<LoadingState label="Se încarcă produsele…" />}>
+      <ProductsList />
+    </Suspense>
   );
 }

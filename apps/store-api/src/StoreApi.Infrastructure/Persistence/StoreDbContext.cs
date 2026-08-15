@@ -30,6 +30,8 @@ public sealed class StoreDbContext : DbContext
 
     public DbSet<Review> Reviews => Set<Review>();
 
+    public DbSet<User> Users => Set<User>();
+
     public DbSet<EventOutbox> EventOutbox => Set<EventOutbox>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -44,6 +46,7 @@ public sealed class StoreDbContext : DbContext
         ConfigureInventory(modelBuilder);
         ConfigureProductEmbedding(modelBuilder);
         ConfigureReview(modelBuilder);
+        ConfigureUser(modelBuilder);
         ConfigureEventOutbox(modelBuilder);
     }
 
@@ -246,6 +249,21 @@ public sealed class StoreDbContext : DbContext
 
             e.HasIndex(r => r.ProductId);
             e.HasIndex(r => r.CustomerId);
+        });
+    }
+
+    private static void ConfigureUser(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<User>(e =>
+        {
+            e.ToTable("users");
+            e.HasKey(u => u.Id);
+            e.Property(u => u.Email).IsRequired().HasMaxLength(320);
+            e.Property(u => u.PasswordHash).IsRequired().HasMaxLength(100);
+            e.Property(u => u.FirstName).IsRequired().HasMaxLength(100);
+            e.Property(u => u.LastName).IsRequired().HasMaxLength(100);
+
+            e.HasIndex(u => u.Email).IsUnique();
         });
     }
 

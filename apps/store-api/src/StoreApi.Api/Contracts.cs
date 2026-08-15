@@ -142,3 +142,33 @@ public sealed record EventResponse(
     string Payload,
     DateTime CreatedAt,
     DateTime? ProcessedAt);
+
+public sealed record RegisterRequest(
+    string Email,
+    string Password,
+    string FirstName,
+    string LastName);
+
+public sealed record LoginRequest(
+    string Email,
+    string Password);
+
+public sealed record RefreshRequest(string RefreshToken);
+
+public sealed record LoginResponse(
+    string AccessToken,
+    string RefreshToken,
+    int ExpiresIn);
+
+public sealed record AddCartItemRequest(
+    Guid ProductId,
+    int Quantity);
+
+public sealed record UpdateCartItemRequest(int Quantity);
+
+public sealed record CartItemResponse(
+    Guid ProductId,
+    string Name,
+    decimal PriceAmount,
+    string PriceCurrency,
+    int Quantity);

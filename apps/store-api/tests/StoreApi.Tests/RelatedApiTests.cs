@@ -17,7 +17,7 @@ public class RelatedApiTests
     public async Task Related_Returns_Empty_When_Recommender_Unavailable()
     {
         await using var factory = CreateFactory();
-        using var client = factory.CreateClient();
+        using var client = await TestAuth.CreateAuthenticatedClientAsync(factory);
 
         var sku = $"REL-{Guid.NewGuid():N}"[..16].ToUpperInvariant();
         var postResponse = await client.PostAsJsonAsync("/products", new
@@ -43,7 +43,7 @@ public class RelatedApiTests
     public async Task Related_Unknown_Product_Returns_NotFound()
     {
         await using var factory = CreateFactory();
-        using var client = factory.CreateClient();
+        using var client = await TestAuth.CreateAuthenticatedClientAsync(factory);
 
         var relatedResponse = await client.GetAsync($"/products/{Guid.NewGuid()}/related");
         Assert.Equal(HttpStatusCode.NotFound, relatedResponse.StatusCode);

@@ -1,0 +1,100 @@
+name: omnichannel
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-store}
+      POSTGRES_USER: ${POSTGRES_USER:-store}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD_lipseste_copiaza_.env.example_in_.env}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-store} -d ${POSTGRES_DB:-store}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  store-api:
+    build:
+      context: ./apps/store-api
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5180
+      ConnectionStrings__StoreApi: ${CONNECTION_STRINGS__STOREAPI:-}
+      Redis__ConnectionString: redis:6379
+      Jwt__Secret: ${JWT_SECRET:?JWT_SECRET_lipseste_copiaza_.env.example_in_.env}
+    ports:
+      - "5180:5180"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  recommender:
+    build:
+      context: ./integrations/recommender
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5181
+      StoreApi__BaseUrl: http://store-api:5180
+    ports:
+      - "5181:5181"
+    depends_on:
+      - store-api
+
+  cdp:
+    build:
+      context: ./integrations/cdp
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      StoreApi__BaseUrl: http://store-api:5180
+      DuckDb__DatabasePath: /app/data/cdp.duckdb
+      StoreApi__CursorFilePath: /app/data/cdp.cursor
+      Iceberg__CatalogPath: /app/data/iceberg
+      ServiceBus__ConnectionString: ${SERVICEBUS_CONNECTION_STRING:-}
+      ServiceBus__QueueName: ${SERVICEBUS_QUEUE_NAME:-}
+      ServiceBus__TopicName: ${SERVICEBUS_TOPIC_NAME:-omnichannel-events}
+      ServiceBus__SubscriptionName: ${SERVICEBUS_SUBSCRIPTION_NAME:-cdp-worker}
+    volumes:
+      - cdp_data:/app/data
+    depends_on:
+      - store-api
+
+  frontend:
+    build:
+      context: ./clients/web
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:5180
+    ports:
+      - "3000:3000"
+    depends_on:
+      - store-api
+
+volumes:
+  postgres_data:
+  cdp_data:

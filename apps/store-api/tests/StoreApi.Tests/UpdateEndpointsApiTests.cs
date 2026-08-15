@@ -6,14 +6,22 @@ using Xunit;
 
 namespace StoreApi.Tests;
 
-public class UpdateEndpointsApiTests : IClassFixture<WebApplicationFactory<global::Program>>
+public class UpdateEndpointsApiTests : IClassFixture<WebApplicationFactory<global::Program>>, IAsyncLifetime
 {
-    private readonly HttpClient _client;
+    private readonly WebApplicationFactory<global::Program> _factory;
+    private HttpClient _client = null!;
 
     public UpdateEndpointsApiTests(WebApplicationFactory<global::Program> factory)
     {
-        _client = factory.CreateClient();
+        _factory = factory;
     }
+
+    public async Task InitializeAsync()
+    {
+        _client = await TestAuth.CreateAuthenticatedClientAsync(_factory);
+    }
+
+    public Task DisposeAsync() => Task.CompletedTask;
 
     [Fact]
     public async Task Put_Category_Updates_Fields()

@@ -98,6 +98,68 @@ export interface CreateReviewRequest {
   customerId: string;
 }
 
+// ---------- Auth ----------
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+}
+
+export interface RegisterResponse {
+  userId: string;
+}
+
+export interface RefreshRequest {
+  refreshToken: string;
+}
+
+export interface LogoutRequest {
+  refreshToken: string;
+}
+
+// ---------- Cart ----------
+export interface CartItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPriceAmount: number;
+  unitPriceCurrency: string;
+}
+
+export interface AddCartItemRequest {
+  productId: string;
+  quantity: number;
+}
+
+export interface UpdateCartItemRequest {
+  quantity: number;
+}
+
+// ---------- Orders (create) ----------
+export interface CreateOrderLineRequest {
+  productId: string;
+  quantity: number;
+}
+
+export interface CreateOrderRequest {
+  customerId: string;
+  currency?: string;
+  notes?: string | null;
+  lines?: CreateOrderLineRequest[];
+}
+
 export function formatMoney(amount: number, currency: string): string {
   return new Intl.NumberFormat("en-US", {
     style: "currency",

@@ -1,0 +1,21 @@
+Ești Frontend Worker (finalizare). Implementezi autentificare, coș, căutare și admin în clientul web (clients/web). Zero placeholder.
+
+CONTEXT: Next.js 15 + Tailwind + shadcn/ui. Pagini în clients/web/src/app (/, /products, /products/[id], /products/new, /orders, /orders/[id]). lib/api.ts are apiGet/apiPost/apiPut/apiDelete. Componente în src/components. Tipuri în src/lib/types.ts.
+
+CONTRACTE BACKEND (le consumi; backend-ul le expune):
+- Auth: POST /auth/register {email,password,firstName,lastName}; POST /auth/login {email,password} -> {accessToken, refreshToken, expiresIn}; POST /auth/refresh {refreshToken}; POST /auth/logout {refreshToken}.
+- Coș: GET /cart; POST /cart/items {productId,quantity}; PUT /cart/items/{productId} {quantity}; DELETE /cart/items/{productId}.
+- Search: GET /products/search?q=...
+
+PAȘI:
+1. AUTH: pagini /login și /register (formuri). Stochează accessToken + refreshToken în localStorage. lib/api.ts: trimite `Authorization: Bearer <token>` pe toate requesturile când tokenul există; la 401 încearcă refresh o dată, apoi redirect la /login. Buton login/logout în header.
+2. COȘ: buton „Adaugă în coș" pe pagina de produs (POST /cart/items); pagină /cart care afișează coșul (GET /cart) cu modificare cantitate + ștergere; buton „Plasează comanda" care creează comanda din coș (POST /orders) și golește coșul.
+3. CĂUTARE: search box în header care navighează la /products?q=... și apelează GET /products/search?q=... (afișează rezultatele pe /products).
+4. ADMIN: pagină /admin cu liste produse/comenzi/recenzii + butoane de ștergere (DELETE). Simplu, fără autentificare specială (doar accesibil).
+5. Actualizează src/lib/types.ts cu noile tipuri (AuthResponse, CartItem, etc.).
+
+VERIFICARE: `cd /root/omnichannel-monorepo/clients/web && npm run build` exit 0.
+
+CONSTRÂNGERI: zero placeholder; nu modifica .agents/bus/contracts.json; păstrează paginile existente.
+
+RĂSPUNDE ÎN ROMÂNĂ: ce ai adăugat, rezultat npm run build, devieri.

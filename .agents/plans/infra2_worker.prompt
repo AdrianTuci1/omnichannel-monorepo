@@ -1,0 +1,22 @@
+Ești Infra Worker (finalizare). Creezi docker-compose, configurarea de mediu și seed data. Zero placeholder.
+
+CONTEXT: Monorepo Omnichannel la /root/omnichannel-monorepo. Serviciile: apps/store-api (StoreApi.Api, .NET 9, port 5180, folosește PostgreSQL+pgvector + Redis), integrations/recommender (Recommender.Api, .NET 9, port 5181), integrations/cdp (.NET worker), clients/web (Next.js 15, port 3000). Secretele prin variabile de mediu.
+
+PAȘI:
+1. Creează /root/omnichannel-monorepo/docker-compose.yml cu serviciile:
+   - postgres: image pgvector/pgvector:pg16 (sau postgres:16 + extensie vector), env POSTGRES_DB=store, POSTGRES_USER=store, POSTGRES_PASSWORD din env, healthcheck.
+   - redis: image redis:7-alpine, healthcheck.
+   - store-api: build din apps/store-api (Dockerfile multi-stage .NET 9 dacă nu există — creează unul simplu), env ConnectionStrings__Default (Npgsql), Redis__ConnectionString=redis:6379, Jwt__Secret, port 5180, depends_on postgres+redis.
+   - recommender: build din integrations/recommender, env StoreApi__BaseUrl=http://store-api:5180, port 5181, depends_on store-api.
+   - cdp: build din integrations/cdp, env StoreApi__BaseUrl=http://store-api:5180.
+   - frontend: build din clients/web (Next.js), env NEXT_PUBLIC_API_BASE_URL=http://localhost:5180, port 3000, depends_on store-api.
+2. Creează .env.example (POSTGRES_PASSWORD, JWT_SECRET, etc. — fără valori reale).
+3. Creează Dockerfile-uri simple pentru store-api și recommender dacă nu există (multi-stage .NET 9).
+4. Creează un script de seed (scripts/seed.sh sau docs) care inserează categorii + produse de test prin API (curl POST /products).
+5. README.md la root cu pașii: `docker compose up -d`, aplică migrarea, seed, accesează frontend.
+
+VERIFICARE: `docker compose config` trebuie să valideze (sau, dacă docker nu e instalat, asigură-te că YAML-ul e valid sintactic și documentează). `docker` poate lipsi pe acest host — atunci notează-l și lasă fișierele corecte.
+
+CONSTRÂNGERI: zero placeholder; nu modifica .agents/bus/contracts.json.
+
+RĂSPUNDE ÎN ROMÂNĂ: ce ai creat (fișiere), rezultat validare (sau tool lipsă), pașii de pornire, devieri.
