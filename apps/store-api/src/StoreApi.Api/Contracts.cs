@@ -61,6 +61,7 @@ public sealed record CreateOrderRequest(
     Guid CustomerId,
     string? Currency = "USD",
     string? Notes = null,
+    string? PaymentMethod = null,
     IReadOnlyList<CreateOrderLineRequest>? Lines = null);
 
 public sealed record OrderLineResponse(
@@ -78,6 +79,8 @@ public sealed record OrderResponse(
     string OrderNumber,
     Guid CustomerId,
     string Status,
+    string PaymentMethod,
+    string PaymentStatus,
     string Currency,
     string? Notes,
     decimal TotalAmount,
@@ -172,3 +175,31 @@ public sealed record CartItemResponse(
     decimal PriceAmount,
     string PriceCurrency,
     int Quantity);
+
+public sealed record ProductListResponse(
+    IReadOnlyList<ProductResponse> Items,
+    int Total,
+    int Page,
+    int PageSize);
+
+public sealed record CreateWarehouseRequest(
+    string Name,
+    string Code);
+
+public sealed record WarehouseResponse(
+    Guid Id,
+    string Name,
+    string Code,
+    bool IsActive);
+
+public sealed record SetWarehouseInventoryRequest(
+    int QuantityOnHand,
+    int Reserved = 0);
+
+public sealed record WarehouseInventoryResponse(
+    Guid WarehouseId,
+    Guid ProductId,
+    string ProductName,
+    string Sku,
+    int QuantityOnHand,
+    int Reserved);

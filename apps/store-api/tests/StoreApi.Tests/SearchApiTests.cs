@@ -32,10 +32,10 @@ public class SearchApiTests : IClassFixture<WebApplicationFactory<global::Progra
         var response = await _client.GetAsync("/products/search?q=Widget");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var products = await response.Content.ReadFromJsonAsync<List<ProductResponse>>();
+        var products = await response.Content.ReadFromJsonAsync<ProductListResponse>();
         Assert.NotNull(products);
-        Assert.Contains(products!, p => p.Name == "Searchable Widget");
-        Assert.DoesNotContain(products!, p => p.Name == "Unrelated Gadget");
+        Assert.Contains(products!.Items, p => p.Name == "Searchable Widget");
+        Assert.DoesNotContain(products.Items, p => p.Name == "Unrelated Gadget");
     }
 
     [Fact]
@@ -46,9 +46,9 @@ public class SearchApiTests : IClassFixture<WebApplicationFactory<global::Progra
         var response = await _client.GetAsync("/products/search?q=SRCH-9999");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var products = await response.Content.ReadFromJsonAsync<List<ProductResponse>>();
+        var products = await response.Content.ReadFromJsonAsync<ProductListResponse>();
         Assert.NotNull(products);
-        Assert.Contains(products!, p => p.Sku == "SRCH-9999");
+        Assert.Contains(products!.Items, p => p.Sku == "SRCH-9999");
     }
 
     [Fact]
@@ -59,22 +59,24 @@ public class SearchApiTests : IClassFixture<WebApplicationFactory<global::Progra
         var response = await _client.GetAsync("/products/search?q=special%20description");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var products = await response.Content.ReadFromJsonAsync<List<ProductResponse>>();
+        var products = await response.Content.ReadFromJsonAsync<ProductListResponse>();
         Assert.NotNull(products);
-        Assert.Contains(products!, p => p.Sku == "SRCH-7777");
+        Assert.Contains(products!.Items, p => p.Sku == "SRCH-7777");
     }
 
     [Fact]
-    public async Task Search_Empty_Query_Returns_Empty()
+    public async Task Search_Empty_Query_Returns_All_Products()
     {
         await CreateProductAsync("Anything", "SRCH-5555");
 
+        // `search` cu termen gol (alias peste /products) nu aplică filtru: returnează totul, paginat.
         var response = await _client.GetAsync("/products/search?q=");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var products = await response.Content.ReadFromJsonAsync<List<ProductResponse>>();
+        var products = await response.Content.ReadFromJsonAsync<ProductListResponse>();
         Assert.NotNull(products);
-        Assert.Empty(products);
+        Assert.True(products!.Total > 0);
+        Assert.Contains(products.Items, p => p.Sku == "SRCH-5555");
     }
 
     private async Task<ProductResponse> CreateProductAsync(string name, string sku, string? description = null)

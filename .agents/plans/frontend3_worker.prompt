@@ -1,0 +1,18 @@
+Ești Frontend Worker (faza 2). Implementezi filtrare complexă și selectorul de metodă de plată în clientul web (clients/web). Zero placeholder.
+
+CONTEXT: Next.js 15 + Tailwind + shadcn/ui. Pagini în clients/web/src/app. lib/api.ts are apiGet/apiPost/apiPut/apiDelete. Tipuri în src/lib/types.ts. Pagina /products și /products/new există.
+
+CONTRACTE BACKEND:
+- Filtrare: GET /products?search=&categoryId=&minPrice=&maxPrice=&inStock=&sort=&page=&pageSize= -> {items, total, page, pageSize}. sort ∈ name|price_asc|price_desc|newest.
+- Plăți: POST /orders acceptă `paymentMethod` ∈ CashOnDelivery|Card|BankTransfer (default CashOnDelivery). OrderResponse conține paymentMethod + paymentStatus.
+
+PAȘI:
+1. FILTRARE UI pe pagina /products: bara de căutare (search), dropdown categorie (GET /categories), interval preț (min/max), checkbox „doar în stoc", sortare (nume, preț cresc/descresc, cele mai noi), paginare (precedent/următor + număr total). Toate aplicate ca query params la GET /products.
+2. PLATĂ la checkout (pagina /cart, la „Plasează comanda"): selector metodă plată (Ramburs / Card / Transfer bancar). Trimite `paymentMethod` în POST /orders. Afișează confirmarea metodei după plasare.
+3. Actualizează src/lib/types.ts (ProductResponse paged, PaymentMethod, etc.).
+
+VERIFICARE: `cd /root/omnichannel-monorepo/clients/web && npm run build` exit 0.
+
+CONSTRÂNGERI: zero placeholder; nu modifica .agents/bus/contracts.json; păstrează paginile existente.
+
+RĂSPUNDE ÎN ROMÂNĂ: ce ai adăugat, rezultat npm run build, devieri.

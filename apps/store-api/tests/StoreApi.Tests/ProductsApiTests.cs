@@ -61,11 +61,12 @@ public class ProductsApiTests : IClassFixture<WebApplicationFactory<global::Prog
         Assert.Equal(created.Id, fetched!.Id);
         Assert.Equal("Test Widget", fetched.Name);
 
-        var listResponse = await _client.GetAsync("/products");
+        // Lista e paginată (default 20); căutăm produsul după SKU pentru a-l găsi indiferent de pagină.
+        var listResponse = await _client.GetAsync($"/products?search={sku}");
         Assert.Equal(HttpStatusCode.OK, listResponse.StatusCode);
 
-        var products = await listResponse.Content.ReadFromJsonAsync<List<ProductResponse>>();
+        var products = await listResponse.Content.ReadFromJsonAsync<ProductListResponse>();
         Assert.NotNull(products);
-        Assert.Contains(products!, p => p.Sku == sku);
+        Assert.Contains(products!.Items, p => p.Sku == sku);
     }
 }

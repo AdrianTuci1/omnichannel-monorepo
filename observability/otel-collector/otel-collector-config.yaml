@@ -1,0 +1,28 @@
+# OpenTelemetry Collector — primește telemetrie OTLP de la store-api și
+# o expune în format Prometheus (exporter `prometheus` pe :8889), de unde
+# Prometheus o scrapează. Folosit ca traseu alternativ/opțional la GET /metrics
+# direct de pe store-api (când store-api exportă OTLP, nu Prometheus direct).
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 5s
+    send_batch_size: 1024
+
+exporters:
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    namespace: omnichannel
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [prometheus]

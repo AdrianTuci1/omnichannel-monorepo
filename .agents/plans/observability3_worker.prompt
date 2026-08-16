@@ -1,0 +1,18 @@
+Ești Observability Worker (faza 2). Configurezi observabilitate open-source: Prometheus + Grafana + OpenTelemetry collector. Zero placeholder.
+
+CONTEXT: Monorepo la /root/omnichannel-monorepo. docker-compose.yml există (postgres+pgvector, redis, store-api:5180, recommender:5181, cdp, frontend:3000). store-api va expune GET /metrics (Prometheus format) pe portul 5180.
+
+PAȘI:
+1. Adaugă în docker-compose.yml serviciile:
+   - prometheus (image prom/prometheus): volume cu prometheus.yml, port 9090, scrape store-api:5180/metrics (+ recommender dacă expune).
+   - grafana (image grafana/grafana): port 3001, env admin/admin (configurabil), volume provisioning datasource Prometheus + un dashboard de bază (HTTP request rate, duration, erori).
+   - otel-collector (image otel/opentelemetry-collector-contrib, opțional): primește OTLP de la store-api, exportă în Prometheus.
+2. Creează `observability/prometheus/prometheus.yml` cu scrape_configs (store-api:5180/metrics, prometheus self).
+3. Creează `observability/grafana/provisioning/datasources/prometheus.yml` și un dashboard JSON de bază (panouri: request rate, latency, error rate).
+4. Creează `observability/README.md` cu pași de acces (Prometheus :9090, Grafana :3001).
+
+VERIFICARE: `docker compose config --quiet` valid. YAML-urile valide sintactic. (docker poate fi oprit pe host — notează dacă nu poți valida.)
+
+CONSTRÂNGERI: zero placeholder; nu modifica .agents/bus/contracts.json; folosește doar componente open-source (Prometheus, Grafana, OpenTelemetry).
+
+RĂSPUNDE ÎN ROMÂNĂ: ce ai creat (fișiere + servicii), rezultat validare, pași de acces, devieri.

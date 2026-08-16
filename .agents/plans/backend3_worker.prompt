@@ -1,0 +1,16 @@
+Ești Backend Worker (faza 2). Implementezi filtrare complexă, plată ramburs, depozite cu alocare și observabilitate în store-api (apps/store-api). Zero placeholder.
+
+CONTEXT: apps/store-api e o Minimal API .NET 9 (EF Core, StoreDbContext, PostgreSQL + pgvector). Entitățile în StoreApi.Domain/Entities, DTO-urile în StoreApi.Api/Contracts.cs, rutele în Program.cs. Auth JWT + Redis deja există. dotnet SDK 9.0.317. Teste în tests/StoreApi.Tests.
+
+PAȘI:
+1. FILTRARE COMPLEXĂ: extinde GET /products cu query params `search`, `categoryId`, `minPrice`, `maxPrice`, `inStock` (bool), `sort` (name|price_asc|price_desc|newest), `page` (default 1), `pageSize` (default 20, max 100). Returnează `{items, total, page, pageSize}`. `search` caută în Name/Sku/Description. Păstrează compatibilitatea (fără params returnează toate, paginat). Actualizează și GET /products/search să suporte aceiași filtri (sau fă-l alias).
+2. PLATĂ RAMBURS: adaugă enums `PaymentMethod` (CashOnDelivery, Card, BankTransfer) și `PaymentStatus` (Pending, Paid, Refunded) în Domain. Order primește `PaymentMethod` + `PaymentStatus`. `CreateOrderRequest` primește `paymentMethod` (default CashOnDelivery). Ramburs (CashOnDelivery) = status Pending la plasare. Expune în OrderResponse.
+3. DEPOZITE + ALOCARE: adaugă entitățile `Warehouse` (Id, Name, Code unic, IsActive) și `WarehouseInventory` (WarehouseId+ProductId cheie compusă, QuantityOnHand, Reserved). Migrare EF Core nouă. Endpoint-uri: GET /warehouses, POST /warehouses (admin), GET /warehouses/{id}/inventory, PUT /warehouses/{id}/inventory/{productId} (set stoc). LA PLASAREA COMENZII: alocă stocul din depozite (first-fit — primul depozit cu stoc suficient pentru fiecare linie; scade QuantityOnHand, crește Reserved). Păstrează Inventory-ul agregat (per produs) sincronizat.
+4. OBSERVABILITATE: adaugă OpenTelemetry (traces HTTP + EF Core) și endpoint `GET /metrics` (Prometheus text format, cu metrice de bază: http_request_duration, http_requests_total). Pachete: OpenTelemetry.Extensions.Hosting, OpenTelemetry.Exporter.Prometheus.AspNetCore (sau OpenTelemetry.Exporter.OpenTelemetryProtocol + prometheus-net). Configurabil prin appsettings (OTLP endpoint opțional).
+5. TESTE xUnit: filtrare (search, price range, paginare), payment method pe order, alocare depozit (creare warehouse + stoc + comandă care alocă).
+
+VERIFICARE: `cd /root/omnichannel-monorepo/apps/store-api && dotnet build store-api.sln --nologo` exit 0 + `dotnet test store-api.sln --nologo` toate testele trec.
+
+CONSTRÂNGERI: zero placeholder; nu modifica .agents/bus/contracts.json; păstrează endpoint-urile existente funcționale; migrare nouă (nu șterge InitialCreate).
+
+RĂSPUNDE ÎN ROMÂNĂ: ce ai adăugat (endpoint-uri, entități, enums, metrice), rezultat build/test, devieri.

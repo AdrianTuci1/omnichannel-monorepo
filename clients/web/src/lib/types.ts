@@ -30,6 +30,13 @@ export interface ProductResponse {
   createdAt: string;
 }
 
+export interface ProductListResponse {
+  items: ProductResponse[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
 export interface OrderLineResponse {
   id: string;
   productId: string;
@@ -49,11 +56,17 @@ export type OrderStatus =
   | "Delivered"
   | "Cancelled";
 
+export type PaymentMethod = "CashOnDelivery" | "Card" | "BankTransfer";
+
+export type PaymentStatus = "Pending" | "Paid" | "Failed" | "Refunded";
+
 export interface OrderResponse {
   id: string;
   orderNumber: string;
   customerId: string;
   status: OrderStatus;
+  paymentMethod: PaymentMethod;
+  paymentStatus: PaymentStatus;
   currency: string;
   notes: string | null;
   totalAmount: number;
@@ -157,6 +170,7 @@ export interface CreateOrderRequest {
   customerId: string;
   currency?: string;
   notes?: string | null;
+  paymentMethod?: PaymentMethod;
   lines?: CreateOrderLineRequest[];
 }
 
@@ -175,4 +189,32 @@ export function formatDate(iso: string): string {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+export function paymentMethodLabel(method: PaymentMethod): string {
+  switch (method) {
+    case "CashOnDelivery":
+      return "Ramburs";
+    case "Card":
+      return "Card";
+    case "BankTransfer":
+      return "Transfer bancar";
+    default:
+      return method;
+  }
+}
+
+export function paymentStatusLabel(status: PaymentStatus): string {
+  switch (status) {
+    case "Pending":
+      return "În așteptare";
+    case "Paid":
+      return "Plătit";
+    case "Failed":
+      return "Eșuat";
+    case "Refunded":
+      return "Rambursat";
+    default:
+      return status;
+  }
 }

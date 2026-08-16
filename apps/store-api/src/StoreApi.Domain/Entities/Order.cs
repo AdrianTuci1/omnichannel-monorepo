@@ -10,7 +10,8 @@ public sealed class Order
     {
     }
 
-    public Order(Guid customerId, string currency = "USD", string? notes = null)
+    public Order(Guid customerId, string currency = "USD", string? notes = null,
+        PaymentMethod paymentMethod = PaymentMethod.CashOnDelivery)
     {
         Id = Guid.NewGuid();
         OrderNumber = GenerateOrderNumber();
@@ -18,6 +19,9 @@ public sealed class Order
         Currency = NormalizeCurrency(currency);
         Notes = notes;
         Status = OrderStatus.Draft;
+        PaymentMethod = paymentMethod;
+        // Ramburs (CashOnDelivery) și celelalte metode pornesc cu plata neconfirmată.
+        PaymentStatus = PaymentStatus.Pending;
         CreatedAt = DateTime.UtcNow;
     }
 
@@ -30,6 +34,10 @@ public sealed class Order
     public Customer Customer { get; private set; } = null!;
 
     public OrderStatus Status { get; private set; }
+
+    public PaymentMethod PaymentMethod { get; private set; }
+
+    public PaymentStatus PaymentStatus { get; private set; }
 
     public string Currency { get; private set; } = "USD";
 

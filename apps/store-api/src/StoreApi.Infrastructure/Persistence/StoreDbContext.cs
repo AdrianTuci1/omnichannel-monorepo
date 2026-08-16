@@ -34,6 +34,10 @@ public sealed class StoreDbContext : DbContext
 
     public DbSet<EventOutbox> EventOutbox => Set<EventOutbox>();
 
+    public DbSet<Warehouse> Warehouses => Set<Warehouse>();
+
+    public DbSet<WarehouseInventory> WarehouseInventories => Set<WarehouseInventory>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         _isInMemory = string.Equals(Database.ProviderName, "Microsoft.EntityFrameworkCore.InMemory", StringComparison.Ordinal);
@@ -48,6 +52,8 @@ public sealed class StoreDbContext : DbContext
         ConfigureReview(modelBuilder);
         ConfigureUser(modelBuilder);
         ConfigureEventOutbox(modelBuilder);
+        ConfigureWarehouse(modelBuilder);
+        ConfigureWarehouseInventory(modelBuilder);
     }
 
     private static void ConfigureCategory(ModelBuilder modelBuilder)
@@ -132,6 +138,8 @@ public sealed class StoreDbContext : DbContext
             e.Property(o => o.OrderNumber).IsRequired().HasMaxLength(40);
             e.Property(o => o.Currency).IsRequired().HasMaxLength(3);
             e.Property(o => o.Status).HasConversion<int>();
+            e.Property(o => o.PaymentMethod).HasConversion<int>();
+            e.Property(o => o.PaymentStatus).HasConversion<int>();
             e.Property(o => o.Notes).HasMaxLength(1000);
 
             e.Ignore(o => o.Total);
@@ -277,6 +285,43 @@ public sealed class StoreDbContext : DbContext
             e.Property(ev => ev.Payload).IsRequired();
 
             e.HasIndex(ev => ev.CreatedAt);
+        });
+    }
+
+    private static void ConfigureWarehouse(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Warehouse>(e =>
+        {
+            e.ToTable("warehouses");
+            e.HasKey(w => w.Id);
+            e.Property(w => w.Name).IsRequired().HasMaxLength(200);
+            e.Property(w => w.Code).IsRequired().HasMaxLength(64);
+            e.Property(w => w.IsActive).IsRequired();
+
+            e.HasIndex(w => w.Code).IsUnique();
+        });
+    }
+
+    private static void ConfigureWarehouseInventory(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<WarehouseInventory>(e =>
+        {
+            e.ToTable("warehouse_inventory");
+            e.HasKey(wi => new { wi.WarehouseId, wi.ProductId });
+            e.Property(wi => wi.QuantityOnHand).IsRequired();
+            e.Property(wi => wi.Reserved).IsRequired();
+
+            e.HasOne(wi => wi.Warehouse)
+                .WithMany(w => w.Inventory)
+                .HasForeignKey(wi => wi.WarehouseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            e.HasOne(wi => wi.Product)
+                .WithMany()
+                .HasForeignKey(wi => wi.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            e.HasIndex(wi => wi.ProductId);
         });
     }
 }

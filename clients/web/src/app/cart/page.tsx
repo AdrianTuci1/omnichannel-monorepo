@@ -8,9 +8,12 @@ import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/api";
 import { getCustomerId, isAuthenticated, saveCustomerId } from "@/lib/auth";
 import {
   formatMoney,
+  paymentMethodLabel,
+  paymentStatusLabel,
   type CartItem,
   type CreateOrderRequest,
   type OrderResponse,
+  type PaymentMethod,
 } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +28,13 @@ const inputClass =
   "w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-neutral-400";
 const labelClass = "text-sm font-medium text-neutral-700";
 
+const PAYMENT_METHODS: { value: PaymentMethod; label: string; hint: string }[] =
+  [
+    { value: "CashOnDelivery", label: "Ramburs", hint: "Plătești la livrare" },
+    { value: "Card", label: "Card", hint: "Plată cu cardul" },
+    { value: "BankTransfer", label: "Transfer bancar", hint: "Plată prin transfer bancar" },
+  ];
+
 export default function CartPage() {
   const [authed, setAuthed] = useState(false);
   const [items, setItems] = useState<CartItem[] | null>(null);
@@ -32,6 +42,8 @@ export default function CartPage() {
   const [customerId, setCustomerId] = useState("");
   const [placing, setPlacing] = useState(false);
   const [placedOrder, setPlacedOrder] = useState<OrderResponse | null>(null);
+  const [paymentMethod, setPaymentMethod] =
+    useState<PaymentMethod>("CashOnDelivery");
 
   const loadCart = useCallback(() => {
     setItems(null);
@@ -85,6 +97,7 @@ export default function CartPage() {
 
     const payload: CreateOrderRequest = {
       customerId: customerId.trim(),
+      paymentMethod,
       lines: items.map((i) => ({
         productId: i.productId,
         quantity: i.quantity,
@@ -144,15 +157,26 @@ export default function CartPage() {
       </div>
 
       {placedOrder ? (
-        <div className="rounded-md border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900">
-          Comanda{" "}
-          <Link
-            href={`/orders/${placedOrder.id}`}
-            className="font-semibold underline underline-offset-2"
-          >
-            {placedOrder.orderNumber}
-          </Link>{" "}
-          a fost plasată cu succes.
+        <div className="flex flex-col gap-1 rounded-md border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900">
+          <span>
+            Comanda{" "}
+            <Link
+              href={`/orders/${placedOrder.id}`}
+              className="font-semibold underline underline-offset-2"
+            >
+              {placedOrder.orderNumber}
+            </Link>{" "}
+            a fost plasată cu succes.
+          </span>
+          <span className="text-neutral-600">
+            Metodă de plată:{" "}
+            {paymentMethodLabel(placedOrder.paymentMethod ?? paymentMethod)}
+            {placedOrder.paymentStatus
+              ? ` · Status plată: ${paymentStatusLabel(
+                  placedOrder.paymentStatus
+                )}`
+              : ""}
+          </span>
         </div>
       ) : null}
 
@@ -254,6 +278,37 @@ export default function CartPage() {
                     placeholder="GUID client"
                   />
                 </div>
+
+                <fieldset className="flex flex-col gap-2">
+                  <legend className={labelClass}>Metodă de plată</legend>
+                  <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
+                    {PAYMENT_METHODS.map((method) => (
+                      <label
+                        key={method.value}
+                        className={`flex flex-1 cursor-pointer flex-col gap-0.5 rounded-md border px-3 py-2 text-sm transition-colors ${
+                          paymentMethod === method.value
+                            ? "border-neutral-900 bg-neutral-50 text-neutral-900"
+                            : "border-neutral-300 bg-white text-neutral-700 hover:border-neutral-400"
+                        }`}
+                      >
+                        <span className="flex items-center gap-2 font-medium">
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value={method.value}
+                            checked={paymentMethod === method.value}
+                            onChange={() => setPaymentMethod(method.value)}
+                            className="accent-neutral-900"
+                          />
+                          {method.label}
+                        </span>
+                        <span className="text-xs text-neutral-500">
+                          {method.hint}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
 
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <span className="text-base font-semibold text-neutral-900">

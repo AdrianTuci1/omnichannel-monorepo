@@ -1,0 +1,14 @@
+# Grafana — provisioning dashboard provider: încarcă automat JSON-urile din
+# /etc/grafana/dashboards (bind-mount cu observability/grafana/dashboards).
+apiVersion: 1
+
+providers:
+  - name: Omnichannel
+    orgId: 1
+    folder: Omnichannel
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/dashboards

@@ -28,7 +28,9 @@ export function AppNav() {
   function handleSearch(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const q = query.trim();
-    router.push(q === "" ? "/products" : `/products?q=${encodeURIComponent(q)}`);
+    router.push(
+      q === "" ? "/products" : `/products?search=${encodeURIComponent(q)}`
+    );
   }
 
   async function handleLogout() {
